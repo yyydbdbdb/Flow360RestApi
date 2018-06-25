@@ -29,16 +29,16 @@ Get information about an uploading or uploaded mesh.
   
     * **Code:** 200 <br />
     **Content:** 
-    ```
-    {
-    id : [integer],
-    size : [integer size in bytes],
-    upload_time: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
-    status: [uploading | uploaded | deleted],
-    name: [string],
-    tag: [list of strings]
-    }
-    ```
+        ```
+        {
+        id : [integer],
+        size : [integer size in bytes],
+        upload_time: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
+        status: [uploading | uploaded | deleted],
+        name: [string],
+        tag: [list of strings]
+        }
+        ```
  
 * **Error Response:**
 
@@ -62,7 +62,10 @@ Get information about an uploading or uploaded mesh.
   });
   ```
 
+* **Notes:**
 
+  Perhaps the status field in the return can be enricched if the
+  upload is split into chunks.
 
 
 ----
@@ -114,7 +117,7 @@ Get information about an uploading or uploaded mesh.
     url: "/mesh/1",
     dataType: "json",
     type : "DELETE",
-    success : function(r) {
+    success : function() {
       console.log("mesh deleted");
     }
   });
@@ -158,12 +161,12 @@ Get information about an uploading or uploaded mesh.
   
     * **Code:** 200 <br />
     **Content:** 
-    ```
-    {
-    id : [integer],
-    upload_time: [string in yyyy:mm:dd:hh:mm:ss.ssssss format]
-    }
-    ```
+        ```
+        {
+        id : [integer],
+        upload_time: [string in yyyy:mm:dd:hh:mm:ss.ssssss format]
+        }
+        ```
  
 * **Error Response:**
 
@@ -208,3 +211,70 @@ Get information about an uploading or uploaded mesh.
 
   A user is allowed to add multiple meshes of the same name, for which
   the server will return different meshId's. So this call is not idempotent.
+
+
+----
+**UploadMesh**
+----
+  Upload the content of a mesh that is alread added through addMesh.
+
+* **URL**
+
+  /mesh/:meshId
+
+* **Method:**
+  
+  `PUT`
+  
+*  **URL Params**
+
+   **Required**
+
+   meshId: [integer]
+
+   **Optional**
+
+* **Data Params**
+
+    None
+
+* **Success Response:**
+  
+    * **Code:** 204 <br />
+    **Content:** None
+ 
+* **Error Response:**
+
+  * **Code:** 401 UNAUTHORIZED <br />
+    **Content:** `{ error : "Log in" }`
+
+  OR
+
+  * **Code:** 404 NOT FOUND <br />
+    **Content:** `{ error : "mesh not found" }`
+
+  OR
+
+  * **Code:** 400 BAD REQUEST <br />
+    **Content:** `{ error : "mesh already deleted" }`
+
+* **Sample Call:**
+
+   ```
+    var formData = new FormData();        
+    formData.append('file', 'multiGigaByteMeshFile.bin');
+
+    $.ajax({
+    url: "/mesh/12",
+    dataType: "json",
+    type : "PUT",
+    data : formData,
+    success : function() {
+      console.log("Upload completed");
+    }
+  });
+  ```
+
+* **Notes:**
+
+    May get more complex if upload in chunks.
