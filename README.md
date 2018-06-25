@@ -1,5 +1,10 @@
+* [GetMeshInfo](#getmeshinfo)
+* [DeleteMesh](#deletemesh)
+* [AddMesh](#addmesh)
+* [UploadMesh](#uploadmesh)
+
 ----
-**GetMeshInfo**
+# GetMeshInfo
 ----
 Get information about an uploading or uploaded mesh.
 
@@ -69,7 +74,7 @@ Get information about an uploading or uploaded mesh.
 
 
 ----
-**DeleteMesh**
+# DeleteMesh
 ----
   Delete a mesh 
 
@@ -125,7 +130,7 @@ Get information about an uploading or uploaded mesh.
 
 
 ----
-**AddMesh**
+# AddMesh
 ----
   Add a mesh with name, tags, etc, but do not start upload yet.
 
@@ -214,7 +219,7 @@ Get information about an uploading or uploaded mesh.
 
 
 ----
-**UploadMesh**
+# UploadMesh
 ----
   Upload the content of a mesh that is alread added through addMesh.
 
