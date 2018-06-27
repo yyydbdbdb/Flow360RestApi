@@ -780,6 +780,12 @@ Pause, Resume, or Cancel a case.
 
   Time in response should be in UTC.
 
+  The JSON interface may have minor updates frequently.  These minor
+  updates will preserve backwards compatibility, so that the client
+  may not have to be updated simutaenously.  Any major upgrades, which
+  cannot be backwards compatible and therefore requires simultaneous
+  upgrade of all clients, should be less frequent.
+
   Possible modelType may grow.
 
   Types of boundary conditions may grow.
