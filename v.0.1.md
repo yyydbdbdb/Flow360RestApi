@@ -6,8 +6,11 @@
 * [GetCaseInfo](#getcaseinfo)
 * [GetCaseStdout](#getcasestdout)
 * [GetCaseConvergence](#getcaseconvergence)
-* [ChangeCaseStatus](#changecasestatus)
+* [GetCaseSolution](#getcasesolution)
+* [DeleteCase](#deletecase)
+* [PauseResumeCase](#pauseresumecase)
 * [SubmitCase](#submitcase)
+* [ForkCase](#forkcase)
 * [ListCases](#listcases)
 
 ----
@@ -42,7 +45,7 @@ Get information about an uploading or uploaded mesh.
         meshId : [integer],
         size : [integer size in bytes],
         uploadTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
-        status: [uploading xx% | uploaded | deleted],
+        status: [uploading | uploaded | deleted],
         name: [string],
         tag: [list of strings]
         }
@@ -384,11 +387,12 @@ Get information about a submitted case.
         {
         caseId : [integer],
         meshId : [integer],
+        parentCaseId : [none | integer],
         cost : [integer in simulation cost units],
         diskUsage : [integer in disk usage units],
         submitTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
         status: [Preprocessing | Starting | Running | Paused
-                 | Cancelled | Completed | Error],
+                 | Deleted | Completed | Failed],
         name: [string],
         tag: [list of strings]
         }
@@ -559,13 +563,118 @@ Get convergence history
 
 
 ----
-# ChangeCaseStatus
+# GetCaseSolution
 
-Pause, Resume, or Cancel a case.
+Get computed solution as a tarball
 
 * **URL**
 
-  /case/:caseId/:status
+  /case/:caseId/solution
+
+* **Method:**
+  
+  `GET`
+    
+*  **URL Params** 
+
+   **Required:**
+ 
+   `caseId=[integer]`
+
+   **Optional:**
+ 
+   None
+
+* **Success Response:**
+  
+    * **Code:** 200 <br />
+
+    **Content:** 
+
+      A .tar.gz file containing the computed solution
+ 
+* **Error Response:**
+
+  * **Code:** 401 UNAUTHORIZED <br />
+    **Content:** `{ error : "Log in" }`
+
+  OR
+
+  * **Code:** 404 NOT FOUND <br />
+    **Content:** `{ error : "Case does not exist" | "No solution yet"}`
+
+* **Sample Call:**
+
+    Not supposed to be called by javascript.
+
+* **Notes:**
+
+    This URL should be revealed in a UI only when a case status shows
+    "Completed" or "Failed".
+    It should be clickable to initiate a download.
+
+
+
+----
+# DeleteCase
+
+  Delete a case
+
+* **URL**
+
+  /case/:caseId
+
+* **Method:**
+  
+  `DELETE`
+  
+*  **URL Params**
+
+   **Required:**
+ 
+   `caseId=[integer]`
+
+   **Optional:**
+ 
+   None
+
+* **Success Response:**
+  
+  * **Code:** 204 <br />
+    **Content:** None
+ 
+* **Error Response:**
+
+  * **Code:** 401 UNAUTHORIZED <br />
+    **Content:** `{ error : "Log in" }`
+
+  OR
+
+  * **Code:** 404 NOT FOUND <br />
+    **Content:** `{ error : "Case does not exist" }`
+
+* **Sample Call:**
+
+   ```
+    $.ajax({
+    url: "/case/1",
+    dataType: "json",
+    type : "DELETE",
+    success : function() {
+      console.log("case deleted");
+    }
+  });
+  ```
+
+
+----
+# PauseResumeCase
+
+Pause or resume a case.
+
+* **URL**
+
+  /case/:caseId/:action
 
 * **Method:**
   
@@ -577,7 +686,7 @@ Pause, Resume, or Cancel a case.
  
    `caseId=[integer]`
 
-   `status=[pause | resume | cancel]`
+   `action=[pause | resume]`
 
    **Optional:**
  
@@ -602,6 +711,11 @@ Pause, Resume, or Cancel a case.
 
   * **Code:** 403 FORBIDDEN <br />
     **Content:** `{ error : "account locked" }`
+
+  OR
+
+  * **Code:** 403 FORBIDDEN <br />
+    **Content:** `{ error : "case deleted", deleteTime: [time in utc] }`
 
 * **Sample Call:**
    ```
@@ -776,7 +890,7 @@ Pause, Resume, or Cancel a case.
 
   A user is allowed to add multiple cases of the same name, for which
   the server will return different caseId's.
-  Thus, UI designers should beware that this call is not idempotent.
+  Thus, UI designers should be aware that this call is not idempotent.
 
   Time in response should be in UTC.
 
@@ -793,6 +907,96 @@ Pause, Resume, or Cancel a case.
   Some boundary conditions will have additional data.
 
   Angles are in radians.
+
+
+----
+# ForkCase
+
+Fork a child case with identical mesh as the parent but modified parameters.
+The child case starts immediately from the final state of the parent case.
+
+* **URL**
+
+  /case/:caseId
+
+* **Method:**
+  
+  `POST`
+    
+*  **URL Params** 
+
+   **Required:**
+ 
+   `caseId=[integer]`
+
+   **Optional:**
+ 
+   None
+
+* **Data Params**
+
+    Identical to [SubmitCase](#submitcase).
+
+* **Success Response:**
+  
+    * **Code:** 200 <br />
+    **Content:** 
+        ```
+        {
+        caseId : [integer],
+        submitTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format]
+        }
+        ```
+ 
+* **Error Response:**
+
+  * **Code:** 401 UNAUTHORIZED <br />
+    **Content:** `{ error : "Log in" }`
+
+  OR
+
+  * **Code:** 404 NOT FOUND <br />
+    **Content:** `{ error : "Case does not exist" }`
+
+  OR
+
+  * **Code:** 400 BAD REQUEST <br />
+    **Content:** `{ error : detailed error message }`
+
+  OR
+
+  * **Code:** 403 FORBIDDEN <br />
+    **Content:** `{ error : "account locked" }`
+
+  OR
+
+  * **Code:** 403 FORBIDDEN <br />
+    **Content:** `{ error : "case deleted", deleteTime: [time in utc] }`
+
+* **Sample Call:**
+    ```
+    $.ajax({
+        url: "/case/542",
+        dataType: "json",
+        type : "POST",
+        data : {
+            name: "M01A0B0",
+            tags: ["Low Mach", "Zero AoA"]
+            meshId : 123,
+            ...
+        }
+    });
+    ```
+
+* **Notes:**
+
+    A user is allowed to fork multiple cases from the same parent with
+    the identical name, for which the server will return different caseId's.
+    Thus, UI designers should be aware that this call is not idempotent.
+
+    See [SubmitCase](#submitcase) for details of the `data` field.
+
+    `meshId`, if provided, must be identical to that of the parent case.
 
 
 ----
