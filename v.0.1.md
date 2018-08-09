@@ -42,12 +42,37 @@ Get information about an uploading or uploaded mesh.
     **Content:** 
         ```
         {
-        meshId : [integer],
-        size : [integer size in bytes],
-        uploadTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
-        status: [uploading | uploaded | deleted],
-        name: [string],
-        tag: [list of strings]
+            meshId : [integer],
+            size : [integer size in bytes],
+            uploadTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
+            status: [uploading | uploaded | deleted],
+            name: [string],
+            tag: [list of strings],
+            format: "aflr3" | "gmsh" | "fluent" | "hdf5",
+            endianness: "little" | "big"
+            analytics: {
+                numNodes: [integer],
+                numEdges: [integer],
+                numElements: [integer],
+                numElementsByType: {
+                    hexahedrons: [integer],
+                    prisms: [integer],
+                    pyramids: [integer],
+                    tetrahedrons: [integer]
+                }
+                controlVolumeBound: {
+                    largest: [float],
+                    smallest: [float],
+                },
+                edgeLengthBounds: {
+                    largest: [float],
+                    smallest: [float],
+                },
+                areaVectorBounds: {
+                    largest: [float],
+                    smallest: [float],
+                }
+            }
         }
         ```
  
@@ -62,14 +87,14 @@ Get information about an uploading or uploaded mesh.
     **Content:** `{ error : "Mesh does not exist" }`
 
 * **Sample Call:**
-   ```
-    $.ajax({
-    url: "/mesh/1",
-    dataType: "json",
-    type : "GET",
-    success : function(r) {
-      console.log(r);
-    }
+  ```
+  $.ajax({
+      url: "/mesh/1",
+      dataType: "json",
+      type : "GET",
+      success : function(r) {
+           console.log(r);
+      }
   });
   ```
 
@@ -118,14 +143,14 @@ Get information about an uploading or uploaded mesh.
 
 * **Sample Call:**
 
-   ```
-    $.ajax({
-    url: "/mesh/1",
-    dataType: "json",
-    type : "DELETE",
-    success : function() {
-      console.log("mesh deleted");
-    }
+  ```
+  $.ajax({
+      url: "/mesh/1",
+      dataType: "json",
+      type : "DELETE",
+      success : function() {
+          console.log("mesh deleted");
+      }
   });
   ```
 
@@ -383,8 +408,8 @@ Get information about a submitted case.
   
     * **Code:** 200 <br />
     **Content:** 
-        ```
-        {
+    ```
+    {
         caseId : [integer],
         meshId : [integer],
         parentCaseId : [none | integer],
@@ -394,9 +419,43 @@ Get information about a submitted case.
         status: [Preprocessing | Starting | Running | Paused
                  | Deleted | Completed | Failed],
         name: [string],
-        tag: [list of strings]
+        tag: [list of strings],
+        navierStokesSolver: {
+            tolerance : [float],
+            CFL: {
+                initial : [float],
+                final : [float],
+                rampSteps : [integer]
+            },
+            linearIterations : [integer]
+        },
+        turbulenceModelSolver :
+        {
+            modelType: "SpalartAllmaras" | none,
+            tolerance : [float],
+            CFL: {
+                initial : [float],
+                final : [float],
+                rampSteps : [integer]
+            },
+            JacobiSweeps : [integer]
+        },
+        freestream :
+        {
+            Reynolds : [float],
+            Mach : [float],
+            Temperature : [float],
+            alphaAngle : [float],
+            betaAngle : [float]
+        },
+        boundaries : {
+            1 : {
+                type : "NoSlipWall" | "SlipWall" | "Freestream"
+            },
+            ...
         }
-        ```
+    }
+    ```
  
 * **Error Response:**
 
