@@ -409,52 +409,52 @@ Get information about a submitted case.
     * **Code:** 200 <br />
     **Content:** 
     ```
-    {
-        caseId : [integer],
-        meshId : [integer],
-        parentCaseId : [none | integer],
-        cost : [integer in simulation cost units],
-        diskUsage : [integer in disk usage units],
-        submitTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
-        status: [Preprocessing | Starting | Running | Paused
-                 | Deleted | Completed | Failed],
-        name: [string],
-        tag: [list of strings],
-        navierStokesSolver: {
-            tolerance : [float],
-            CFL: {
-                initial : [float],
-                final : [float],
-                rampSteps : [integer]
-            },
-            linearIterations : [integer]
-        },
-        turbulenceModelSolver :
         {
-            modelType: "SpalartAllmaras" | none,
-            tolerance : [float],
-            CFL: {
-                initial : [float],
-                final : [float],
-                rampSteps : [integer]
+            caseId : [integer],
+            meshId : [integer],
+            parentCaseId : [none | integer],
+            cost : [integer in simulation cost units],
+            diskUsage : [integer in disk usage units],
+            submitTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
+            status: [Preprocessing | Starting | Running | Paused
+                     | Deleted | Completed | Failed],
+            name: [string],
+            tag: [list of strings],
+            navierStokesSolver: {
+                tolerance : [float],
+                CFL: {
+                    initial : [float],
+                    final : [float],
+                    rampSteps : [integer]
+                },
+                linearIterations : [integer]
             },
-            JacobiSweeps : [integer]
-        },
-        freestream :
-        {
-            Reynolds : [float],
-            Mach : [float],
-            Temperature : [float],
-            alphaAngle : [float],
-            betaAngle : [float]
-        },
-        boundaries : {
-            1 : {
-                type : "NoSlipWall" | "SlipWall" | "Freestream"
+            turbulenceModelSolver :
+            {
+                modelType: "SpalartAllmaras" | none,
+                tolerance : [float],
+                CFL: {
+                    initial : [float],
+                    final : [float],
+                    rampSteps : [integer]
+                },
+                JacobiSweeps : [integer]
             },
-            ...
+            freestream :
+            {
+                Reynolds : [float],
+                Mach : [float],
+                Temperature : [float],
+                alphaAngle : [float],
+                betaAngle : [float]
+            },
+            boundaries : {
+                1 : {
+                    type : "NoSlipWall" | "SlipWall" | "Freestream"
+                },
+                ...
+            }
         }
-    }
     ```
  
 * **Error Response:**
