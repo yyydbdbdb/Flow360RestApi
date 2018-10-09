@@ -45,7 +45,7 @@ Get information about an uploading or uploaded mesh.
             meshId : [integer],
             size : [integer size in bytes],
             uploadTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
-            status: [uploading | uploaded | deleted],
+            status: [ waiting for upload | uploading | uploaded | deleted],
             name: [string],
             tag: [list of strings],
             format: "aflr3" | "gmsh" | "fluent" | "hdf5",
@@ -182,7 +182,10 @@ Get information about an uploading or uploaded mesh.
         name: [string],
         tag: [list of strings]
         format: "aflr3" | "gmsh" | "fluent" | "hdf5",
-        endianness: "little" | "big"
+        endianness: "little" | "big",
+        boundaries: {
+            noSlipWalls: [list of integers]
+        }
     }
     ```
 
@@ -228,7 +231,10 @@ Get information about an uploading or uploaded mesh.
         endianness: "little",
         name: "FullGoemTakeOffExtFlap20degRefineLvl5",
         tags: ["Full Geometry", "Take off", "Extended Flap", "20 Degrees",
-               "Potential stall"]
+               "Potential stall"],
+        boundaries: {
+            noSlipWalls: [2, 3, 5, 7, 9]
+        }
     },
     success : function(r) {
       console.log(r);
@@ -416,43 +422,56 @@ Get information about a submitted case.
             cost : [integer in simulation cost units],
             diskUsage : [integer in disk usage units],
             submitTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
-            status: [Preprocessing | Starting | Running | Paused
+            status: [Queued | Preprocessing | Starting | Running | Paused
                      | Deleted | Completed | Failed],
             name: [string],
             tag: [list of strings],
-            navierStokesSolver: {
-                tolerance : [float],
-                CFL: {
-                    initial : [float],
-                    final : [float],
-                    rampSteps : [integer]
+            runtimeParams: {
+                geometry: {
+                    refArea: [float]
                 },
-                linearIterations : [integer]
-            },
-            turbulenceModelSolver :
-            {
-                modelType: "SpalartAllmaras" | none,
-                tolerance : [float],
-                CFL: {
-                    initial : [float],
-                    final : [float],
-                    rampSteps : [integer]
+                volumeOutput: {
+                    vorticity : [true | false],
+                    residual: [true | false],
+                    T: [true | false],
+                    s: [true | false],
+                    mut: [true | false],
+                    mutRatio: [true | false]
                 },
-                JacobiSweeps : [integer]
-            },
-            freestream :
-            {
-                Reynolds : [float],
-                Mach : [float],
-                Temperature : [float],
-                alphaAngle : [float],
-                betaAngle : [float]
-            },
-            boundaries : {
-                1 : {
-                    type : "NoSlipWall" | "SlipWall" | "Freestream"
+                navierStokesSolver: {
+                    tolerance : [float],
+                    CFL: {
+                        initial : [float],
+                        final : [float],
+                        rampSteps : [integer]
+                    },
+                    linearIterations : [integer]
                 },
-                ...
+                turbulenceModelSolver :
+                {
+                    modelType: "SpalartAllmaras" | none,
+                    tolerance : [float],
+                    CFL: {
+                        initial : [float],
+                        final : [float],
+                        rampSteps : [integer]
+                    },
+                    JacobiSweeps : [integer]
+                },
+                freestream :
+                {
+                    Reynolds : [float],
+                    Mach : [float],
+                    Temperature : [float],
+                    alphaAngle : [float],
+                    betaAngle : [float]
+                },
+                boundaries : {
+                    1 : {
+                        type : "NoSlipWall" | "SlipWall" | "Freestream"
+                    },
+                    ...
+                }
             }
         }
     ```
@@ -584,7 +603,12 @@ Get convergence history
         ```
         {
         numSteps: [integer],
-        residual: [list of floats of length :numSteps],
+        residualDensity: [list of floats of length :numSteps],
+        residualMomX: [list of floats of length :numSteps],
+        residualMomY: [list of floats of length :numSteps],
+        residualMomZ: [list of floats of length :numSteps],
+        residualMomEnergy: [list of floats of length :numSteps],
+        residualMomNut: [list of floats of length :numSteps],
         forceX: [list of floats of length :numSteps],
         forceY: [list of floats of length :numSteps],
         forceZ: [list of floats of length :numSteps],
@@ -820,39 +844,52 @@ Pause or resume a case.
         name : [string],
         tag : [list of strings],
         meshId : [integer],
-        navierStokesSolver: {
-            tolerance : [float],
-            CFL: {
-                initial : [float],
-                final : [float],
-                rampSteps : [integer]
+        runtimeParams: {
+            geometry: {
+                refArea: [float]
             },
-            linearIterations : [integer]
-        },
-        turbulenceModelSolver :
-        {
-            modelType: "SpalartAllmaras" | none,
-            tolerance : [float],
-            CFL: {
-                initial : [float],
-                final : [float],
-                rampSteps : [integer]
+            volumeOutput: {
+                vorticity : [true | false],
+                residual: [true | false],
+                T: [true | false],
+                s: [true | false],
+                mut: [true | false],
+                mutRatio: [true | false]
             },
-            JacobiSweeps : [integer]
-        },
-        freestream :
-        {
-            Reynolds : [float],
-            Mach : [float],
-            Temperature : [float],
-            alphaAngle : [float],
-            betaAngle : [float]
-        },
-        boundaries : {
-            1 : {
-                type : "NoSlipWall" | "SlipWall" | "Freestream"
+            navierStokesSolver: {
+                tolerance : [float],
+                CFL: {
+                    initial : [float],
+                    final : [float],
+                    rampSteps : [integer]
+                },
+                linearIterations : [integer]
             },
-            ...
+            turbulenceModelSolver :
+            {
+                modelType: "SpalartAllmaras" | none,
+                tolerance : [float],
+                CFL: {
+                    initial : [float],
+                    final : [float],
+                    rampSteps : [integer]
+                },
+                JacobiSweeps : [integer]
+            },
+            freestream :
+            {
+                Reynolds : [float],
+                Mach : [float],
+                Temperature : [float],
+                alphaAngle : [float],
+                betaAngle : [float]
+            },
+            boundaries : {
+                1 : {
+                    type : "NoSlipWall" | "SlipWall" | "Freestream"
+                },
+                ...
+            }
         }
     }
     ```
@@ -898,44 +935,57 @@ Pause or resume a case.
             name: "M01A0B0",
             tags: ["Low Mach", "Zero AoA"]
             meshId : 123,
-            navierStokesSolver :
-            {
-                tolerance : 1.0e-10,
-                CFL: {
-                    initial : 1.0,
-                    final : 500,
-                    rampSteps : 200
+            runtimeParams: {
+                geometry: {
+                    refArea: 100.0
                 },
-                linearIterations : 30
-            },
-            turbulenceModelSolver :
-            {
-                modelType: "SpalartAllmaras",
-                tolerance : 1.0e-6,
-                CFL: {
-                    initial : 0.1,
-                    final : 5.0,
-                    rampSteps : 100
+                volumeOutput: {
+                    vorticity : false,
+                    residual: false,
+                    T: false,
+                    s: false,
+                    mut: false,
+                    mutRatio: false
                 },
-                linearIterations : 20
-            },
-            freestream :
-            {
-                Reynolds : 1e3,
-                Mach : 0.25,
-                Temperature : 300,
-                alphaAngle : 0.0,
-                betaAngle : 0.0
-            },
-            boundaries : {
-                1 : {
-                    type : NoSlipWall
+                navierStokesSolver :
+                {
+                    tolerance : 1.0e-10,
+                    CFL: {
+                        initial : 0.5,
+                        final : 200,
+                        rampSteps : 200
+                    },
+                    linearIterations : 30
                 },
-                2 : {
-                    type : SlipWall
+                turbulenceModelSolver :
+                {
+                    modelType: "SpalartAllmaras",
+                    tolerance : 1.0e-8,
+                    CFL: {
+                        initial : 0.5,
+                        final : 200,
+                        rampSteps : 200
+                    },
+                    linearIterations : 20
                 },
-                3 : {
-                    type : Freestream
+                freestream :
+                {
+                    Reynolds : 1e7,
+                    Mach : 0.25,
+                    Temperature : 300,
+                    alphaAngle : 0.0,
+                    betaAngle : 0.0
+                },
+                boundaries : {
+                    1 : {
+                        type : NoSlipWall
+                    },
+                    2 : {
+                        type : SlipWall
+                    },
+                    3 : {
+                        type : Freestream
+                    }
                 }
             }
         },
