@@ -60,7 +60,7 @@ Get information about an uploading or uploaded mesh.
                     pyramids: [integer],
                     tetrahedrons: [integer]
                 }
-                controlVolumeBound: {
+                dualControlVolumeBound: {
                     largest: [float],
                     smallest: [float],
                 },
