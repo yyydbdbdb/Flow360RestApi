@@ -42,7 +42,7 @@ Get information about an uploading or uploaded mesh.
     **Content:** 
         ```
         {
-            meshId : [integer],
+            meshId : [string],
             size : [integer size in bytes],
             uploadTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
             status: [ waitingForUpload | uploading | uploaded | deleted],
