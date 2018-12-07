@@ -245,7 +245,7 @@ List all meshes belonging to the user
     **Content:** 
         ```
         {
-        caseId : [list of strings]
+        meshIds : [list of strings]
         }
         ```
  
