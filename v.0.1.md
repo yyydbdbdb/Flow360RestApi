@@ -30,7 +30,7 @@ Get information about an uploading or uploaded mesh.
 
    **Required:**
  
-   `meshId=[integer]`
+   `meshId=[string]`
 
    **Optional:**
  
@@ -45,51 +45,28 @@ Get information about an uploading or uploaded mesh.
             meshId : [integer],
             size : [integer size in bytes],
             uploadTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
-            status: [ waiting for upload | uploading | uploaded | deleted],
+            status: [ waitingForUpload | uploading | uploaded | deleted],
             name: [string],
-            tag: [list of strings],
-            format: "aflr3" | "gmsh" | "fluent" | "hdf5",
-            endianness: "little" | "big"
-            analytics: {
-                numNodes: [integer],
-                numEdges: [integer],
-                numElements: [integer],
-                numElementsByType: {
-                    hexahedrons: [integer],
-                    prisms: [integer],
-                    pyramids: [integer],
-                    tetrahedrons: [integer]
-                }
-                dualControlVolumeBound: {
-                    largest: [float],
-                    smallest: [float],
-                },
-                edgeLengthBounds: {
-                    largest: [float],
-                    smallest: [float],
-                },
-                areaVectorBounds: {
-                    largest: [float],
-                    smallest: [float],
-                }
-            }
+            tags: [list of strings],
+            format: ["aflr3"],
+            endianness: ["little" | "big"]
         }
         ```
  
 * **Error Response:**
 
   * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** `{ error : "Log in" }`
+    **Content:** `{ error : "unauthorized" }`
 
   OR
 
   * **Code:** 404 NOT FOUND <br />
-    **Content:** `{ error : "Mesh does not exist" }`
+    **Content:** `{ error : "objectNotFound" }`
 
 * **Sample Call:**
   ```
   $.ajax({
-      url: "/mesh/1",
+      url: "/mesh/?meshId=abdcefg",
       dataType: "json",
       type : "GET",
       success : function(r) {
@@ -120,7 +97,7 @@ Get information about an uploading or uploaded mesh.
 
    **Required:**
  
-   `meshId=[integer]`
+   `meshId=[string]`
 
    **Optional:**
  
@@ -134,18 +111,14 @@ Get information about an uploading or uploaded mesh.
 * **Error Response:**
 
   * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** `{ error : "Log in" }`
+    **Content:** `{ error : "unauthorized" }`
 
-  OR
-
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** `{ error : "Mesh does not exist" }`
 
 * **Sample Call:**
 
   ```
   $.ajax({
-      url: "/mesh/1",
+      url: "/mesh/?meshId=abcdef",
       dataType: "json",
       type : "DELETE",
       success : function() {
@@ -178,14 +151,11 @@ Get information about an uploading or uploaded mesh.
 
     ```
     {
-        size : [integer size in bytes],
         name: [string],
         tag: [list of strings]
-        format: "aflr3" | "gmsh" | "fluent" | "hdf5",
-        endianness: "little" | "big",
-        boundaries: {
-            noSlipWalls: [list of integers]
-        }
+        format: ["aflr3"],
+        endianness: ["little" | "big"],
+        noSlipWalls: [list of integers]
     }
     ```
 
@@ -205,36 +175,29 @@ Get information about an uploading or uploaded mesh.
 * **Error Response:**
 
   * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** `{ error : "Log in" }`
+    **Content:** `{ error : "unauthorized" }`
 
   OR
 
   * **Code:** 400 BAD REQUEST <br />
     **Content:** `{ error :
-        "invalid size" | "invalid name" | "invalid tag"
-        | "format not supported" | "unrecognized endianness" }`
+        "invalidName" | "invalidTag"
+        | "invalidFormat" | "invalidEndianness" }`
 
-  OR
-
-  * **Code:** 403 FORBIDDEN <br />
-    **Content:** `{ error : "account locked" }`
 
 * **Sample Call:**
 
    ```
     $.ajax({
-    url: "/mesh",
+    url: "/mesh?meshId=abcd",
     dataType: "json",
     type : "POST",
     data : {
-        size: 1323483768,
         endianness: "little",
         name: "FullGoemTakeOffExtFlap20degRefineLvl5",
         tags: ["Full Geometry", "Take off", "Extended Flap", "20 Degrees",
                "Potential stall"],
-        boundaries: {
-            noSlipWalls: [2, 3, 5, 7, 9]
-        }
+        noSlipWalls: [2, 3, 5, 7, 9]
     },
     success : function(r) {
       console.log(r);
@@ -249,71 +212,6 @@ Get information about an uploading or uploaded mesh.
   Thus, UI designers should beware that this call is not idempotent.
 
   Time in response should be in UTC.
-
-
-----
-# UploadMesh
-
-  Upload the content of a mesh that is alread added through addMesh.
-
-* **URL**
-
-  /mesh/:meshId
-
-* **Method:**
-  
-  `PUT`
-  
-*  **URL Params**
-
-   **Required**
-
-   meshId: [integer]
-
-   **Optional**
-
-* **Success Response:**
-  
-    * **Code:** 204 <br />
-    **Content:** None
- 
-* **Error Response:**
-
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** `{ error : "Log in" }`
-
-  OR
-
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** `{ error : "mesh not found" }`
-
-  OR
-
-  * **Code:** 400 BAD REQUEST <br />
-    **Content:** `{ error : "mesh already deleted" }`
-
-* **Sample Call:**
-
-   ```
-    var formData = new FormData();        
-    formData.append('file', 'multiGigaByteMeshFile.ugrid');
-
-    $.ajax({
-    url: "/mesh/12",
-    dataType: "json",
-    type : "PUT",
-    processData: false,
-    contentType: false,
-    data : formData,
-    success : function() {
-      console.log("Upload completed");
-    }
-  });
-  ```
-
-* **Notes:**
-
-    May get more complex if upload in chunks.
 
 
 ----
@@ -337,13 +235,9 @@ List all meshes belonging to the user
 
    **Optional:**
  
-    `caseName=[string]`
+    `name=[string]`
 
-    `tag=[list of strings]`
-    
-    `uploadedAfter=[yyyy:mm:dd:hh:mm:ss.ssssss]`
-
-    `uploadedBefore=[yyyy:mm:dd:hh:mm:ss.ssssss]`
+    `status=[waitingForUpload | uploading | uploaded | deleted]`
 
 * **Success Response:**
   
@@ -351,7 +245,7 @@ List all meshes belonging to the user
     **Content:** 
         ```
         {
-        caseId : [list of integers]
+        caseId : [list of strings]
         }
         ```
  
@@ -363,11 +257,7 @@ List all meshes belonging to the user
 * **Sample Call:**
    ```
     $.ajax({
-    url: "/mesh",
-    data: {
-        tag: ["Potential stall"],
-        uploadedAfter: "2018:07:01:13:59:59.999999"
-    },
+    url: "/mesh?name='somename'",
     dataType: "json",
     type : "GET",
     success : function(r) {
