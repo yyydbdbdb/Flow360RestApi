@@ -1,7 +1,6 @@
 * [GetMeshInfo](#getmeshinfo)
 * [DeleteMesh](#deletemesh)
 * [AddMesh](#addmesh)
-* [UploadMesh](#uploadmesh)
 * [ListMeshes](#listmeshes)
 * [GetCaseInfo](#getcaseinfo)
 * [GetCaseStdout](#getcasestdout)
@@ -20,7 +19,7 @@ Get information about an uploading or uploaded mesh.
 
 * **URL**
 
-  /mesh/:meshId
+  /get-mesh-info?meshId=someid
 
 * **Method:**
   
@@ -66,7 +65,7 @@ Get information about an uploading or uploaded mesh.
 * **Sample Call:**
   ```
   $.ajax({
-      url: "/mesh/?meshId=abdcefg",
+      url: "/get-mesh-info?meshId=abdcefg",
       dataType: "json",
       type : "GET",
       success : function(r) {
@@ -87,7 +86,7 @@ Get information about an uploading or uploaded mesh.
 
 * **URL**
 
-  /mesh/:meshId
+  /delete-mesh?meshId=someid
 
 * **Method:**
   
@@ -118,7 +117,7 @@ Get information about an uploading or uploaded mesh.
 
   ```
   $.ajax({
-      url: "/mesh/?meshId=abcdef",
+      url: "/delete-mesh?meshId=abcdef",
       dataType: "json",
       type : "DELETE",
       success : function() {
@@ -135,7 +134,7 @@ Get information about an uploading or uploaded mesh.
 
 * **URL**
 
-  /mesh
+  /mesh/add-mesh
 
 * **Method:**
   
@@ -189,7 +188,7 @@ Get information about an uploading or uploaded mesh.
 
    ```
     $.ajax({
-    url: "/mesh?meshId=abcd",
+    url: "/add-mesh",
     dataType: "json",
     type : "POST",
     data : {
@@ -221,7 +220,7 @@ List all meshes belonging to the user
 
 * **URL**
 
-  /mesh
+  /list-meshes?name=somename,status=somestatus
 
 * **Method:**
   
