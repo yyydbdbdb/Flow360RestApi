@@ -43,7 +43,7 @@ Get information about an uploading or uploaded mesh.
         {
             meshId : [string],
             size : [integer size in bytes],
-            uploadTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
+            addTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format],
             status: [ waitingForUpload | uploading | uploaded | deleted],
             name: [string],
             tags: [list of strings],
@@ -167,7 +167,7 @@ Get information about an uploading or uploaded mesh.
         ```
         {
         meshId : [integer],
-        uploadTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format]
+        addTime: [string in yyyy:mm:dd:hh:mm:ss.ssssss format]
         }
         ```
  
