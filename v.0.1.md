@@ -256,7 +256,7 @@ List all meshes belonging to the user
 * **Sample Call:**
    ```
     $.ajax({
-    url: "/mesh?name='somename'",
+    url: "/mesh?name=somename",
     dataType: "json",
     type : "GET",
     success : function(r) {
