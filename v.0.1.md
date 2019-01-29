@@ -353,7 +353,7 @@ Get information about a submitted case.
                 },
                 turbulenceModelSolver :
                 {
-                    modelType: "SpalartAllmaras" | none,
+                    modelType: "SpalartAllmaras" | "None",
                     tolerance : [float],
                     CFL: {
                         initial : [float],
