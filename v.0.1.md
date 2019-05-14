@@ -15,7 +15,7 @@
 ----
 # GetMeshInfo
 
-Get information about an uploading or uploaded mesh.
+Get information about an uploading or uploaded mesh, including size, addTime, status, name, tags, format, and endianness
 
 * **URL**
 
